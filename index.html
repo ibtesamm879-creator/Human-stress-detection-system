@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Stress Classification — Deep Learning Analytics</title>
+    <!-- Modern Premium Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Advanced Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #f8fafc;        /* Soft Slate Light Background */
+            --primary: #6366f1;         /* Indigo Violet */
+            --primary-glow: rgba(99, 102, 241, 0.12);
+            --secondary: #10b981;       /* Cool Mint Green */
+            --secondary-glow: rgba(16, 185, 129, 0.12);
+            --warning: #f59e0b;         /* Amber */
+            --danger: #ef4444;          /* Crimson Red */
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --border: rgba(15, 23, 42, 0.08);
+            --text-main: #0f172a;       /* Dark Indigo-Slate */
+            --text-muted: #64748b;     /* Muted Grey-Blue */
+            --font-display: 'Outfit', sans-serif;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        /* Smooth Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Decorative Glowing Background Shapes */
+        .bg-glow-1 {
+            position: fixed;
+            width: 45vw;
+            height: 45vw;
+            top: -15%;
+            left: -10%;
+            background: radial-gradient(circle, var(--primary-glow) 0%, rgba(248, 250, 252, 0) 70%);
+            z-index: -1;
+            filter: blur(100px);
+            animation: float-glow 15s infinite alternate ease-in-out;
+        }
+
+        .bg-glow-2 {
+            position: fixed;
+            width: 40vw;
+            height: 40vw;
+            bottom: -10%;
+            right: -5%;
+            background: radial-gradient(circle, var(--secondary-glow) 0%, rgba(248, 250, 252, 0) 70%);
+            z-index: -1;
+            filter: blur(90px);
+            animation: float-glow 18s infinite alternate-reverse ease-in-out;
+        }
+
+        @keyframes float-glow {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.7; }
+            100% { transform: scale(1.1) translate(30px, 20px); opacity: 1; }
+        }
+
+        /* Main Container */
+        .app-container {
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+        }
+
+        /* Premium Glassmorphic Card Style */
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 16px 36px rgba(99, 102, 241, 0.06);
+        }
+
+        /* Header Styling */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 8px var(--primary-glow));
+        }
+
+        .brand-title h1 {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        .brand-title p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .sys-badge {
+            background: rgba(99, 102, 241, 0.06);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 30px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--secondary);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--secondary);
+            animation: pulse-active 1.5s infinite;
+        }
+
+        @keyframes pulse-active {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        /* 2-Column Professional Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.2rem;
+            margin-bottom: 2.2rem;
+        }
+
+        @media (max-width: 968px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .section-header i {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .section-header h2 {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Column 1: Core Scanning Suite */
+        .scanning-suite {
+            padding: 1.75rem;
+        }
+
+        /* Toggle Tabs */
+        .console-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: rgba(15, 23, 42, 0.03);
+            border-radius: 12px;
+            padding: 0.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.6rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            transition: all 0.25s ease;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+            border: 1px solid rgba(15, 23, 42, 0.02);
+        }
+
+        /* File Dropzone */
+        .upload-area {
+            border: 2px dashed rgba(99, 102, 241, 0.25);
+            border-radius: 14px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.02);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .upload-area:hover .upload-icon {
+            transform: translateY(-4px);
+        }
+
+        .upload-area p {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+        }
+
+        .upload-area span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Webcam Panel */
+        .camera-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .camera-box {
+            width: 100%;
+            max-width: 380px;
+            aspect-ratio: 4/3;
+            background: #0f172a;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        #webcam-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        /* Scanline Overlay */
+        .scanner-laser {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, transparent, var(--primary), transparent);
+            box-shadow: 0 0 12px var(--primary);
+            animation: laser-scan 2s infinite linear;
+            z-index: 5;
+        }
+
+        @keyframes laser-scan {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+
+        /* Preview Display */
+        .preview-wrapper {
+            display: none;
+            width: 100%;
+            max-width: 240px;
+            margin: 0 auto 1.2rem;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            position: relative;
+            aspect-ratio: 1;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-preview {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(239, 68, 68, 0.9);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .remove-preview:hover {
+            background: var(--danger);
+        }
+
+
+
+        /* Button controls */
+        .btn {
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            font-family: var(--font-display);
+            font-weight: 700;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+            transition: all 0.25s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-1.5px);
+            box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Diagnostic Loader */
+        .scanner-loader {
+            display: none;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .spinner-ring {
+            width: 45px;
+            height: 45px;
+            border: 3px solid rgba(99, 102, 241, 0.1);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Column 2: Cognitive Analysis Console */
+        .cognitive-console {
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .blank-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+            min-height: 320px;
+            color: var(--text-muted);
+        }
+
+        .blank-state i {
+            font-size: 3.5rem;
+            color: rgba(99, 102, 241, 0.15);
+            margin-bottom: 1rem;
+        }
+
+        /* Results panel */
+        .results-panel {
+            display: none;
+            animation: fade-in 0.4s ease-out;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .gauge-metric {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-title h3 {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        .metric-title p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .badge-status {
+            border-radius: 20px;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-stress {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .status-normal {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--secondary);
+        }
+
+        /* Indicators */
+        .progress-indicator {
+            margin-bottom: 1.2rem;
+        }
+
+        .indicator-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .progress-track {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .fill-stress {
+            background: linear-gradient(to right, var(--primary), var(--danger));
+        }
+
+        .fill-normal {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+
+        /* Clinical Directive Advice Card */
+        .recommendation-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-start;
+        }
+
+        .recommendation-card i {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-top: 0.1rem;
+        }
+
+        .recommendation-content h4 {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .recommendation-content p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* MobileNetV2 Pipeline flow visualizer */
+        .architect-info {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 1.2rem;
+            border: 1px solid var(--border);
+        }
+
+        .architect-info h4 {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .architect-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.2rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .flow-node {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.4rem 0.5rem;
+            flex: 1;
+            color: var(--text-main);
+        }
+
+        .flow-node.active-node {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.02);
+        }
+
+        .flow-arrow {
+            font-size: 0.7rem;
+            color: var(--primary);
+        }
+
+        /* Full Width Historical Trend Line Chart */
+        .analytics-card {
+            padding: 1.75rem;
+            margin-top: 2.2rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-top: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 3.5rem;
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        footer p i {
+            color: var(--danger);
+            margin: 0 0.15rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Light Background Decorative Elements -->
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+
+    <div class="app-container">
+        
+        <!-- Premium Navigation Header -->
+        <header>
+            <div class="brand-section">
+                <i class="fa-solid fa-circle-nodes brand-icon"></i>
+                <div class="brand-title">
+                    <h1>Human Stress Classification</h1>
+                    <p>Deep Learning Cognitive Analysis System</p>
+                </div>
+            </div>
+            <div class="sys-badge">
+                <span class="pulse-dot"></span>
+                FastAPI Server Active
+            </div>
+        </header>
+
+        <!-- Modern dashboard upper layout grid -->
+        <div class="dashboard-grid">
+            
+            <!-- Column 1: Core Scanning Suite -->
+            <div class="glass-card scanning-suite">
+                <div class="section-header">
+                    <i class="fa-solid fa-expand"></i>
+                    <h2>Visual Diagnosis Console</h2>
+                </div>
+
+                <!-- File Dropzone Container -->
+                <div id="upload-panel">
+                    <div class="upload-area" id="drop-area" onclick="triggerFileSelect()">
+                        <i class="fa-solid fa-face-smile-beam upload-icon"></i>
+                        <p>Drag & drop face portrait or click to browse</p>
+                        <span>Supports JPG, PNG (RGB normalized to 224x224)</span>
+                        <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
+                    </div>
+                </div>
+
+                <!-- Image Selected / Snapshot Preview Screen -->
+                <div class="preview-wrapper" id="preview-wrapper">
+                    <button class="remove-preview" onclick="clearPreview()" title="Clear image">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <img class="preview-img" id="preview-img" src="" alt="Selected face preview">
+                </div>
+
+                <!-- Scanner Animated Loader -->
+                <div class="scanner-loader" id="loader">
+                    <div class="spinner-ring"></div>
+                    <p style="font-weight: 600; color: var(--primary); font-size: 0.9rem;">Analyzing Micro-Expressions...</p>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Predicting Transfer-Learned MobileNetV2 Tensor Outputs</span>
+                </div>
+
+                <!-- Run Diagnosis Action Button -->
+                <div style="margin-top: 1.5rem;">
+                    <button class="btn" id="analyze-btn" disabled onclick="runStressDiagnosis()">
+                        <i class="fa-solid fa-microscope"></i> Initiate Neuro-Stress Scan
+                    </button>
+                </div>
+
+
+
+            </div>
+
+            <!-- Column 2: Cognitive Analysis Console -->
+            <div class="glass-card cognitive-console" id="cognitive-console">
+                
+                <!-- Blank Initial State -->
+                <div class="blank-state" id="blank-result-state">
+                    <i class="fa-solid fa-brain"></i>
+                    <h3>Diagnostic Diagnostics Engine</h3>
+                    <p style="max-width: 280px; font-size: 0.85rem; margin-top: 0.4rem;">
+                        Scan a visual micro-expression or choose a sample to render physiological metrics.
+                    </p>
+                </div>
+
+                <!-- Results Output Panel -->
+                <div class="results-panel" id="results-panel">
+                    
+                    <div class="gauge-metric">
+                        <div class="metric-title">
+                            <h3>Neuro-Stress Indices</h3>
+                            <p id="result-timestamp">Analyzed just now</p>
+                        </div>
+                        <span class="badge-status" id="stress-badge">Calm</span>
+                    </div>
+
+                    <!-- Progress Bar Metrics -->
+                    <div class="progress-indicator">
+                        <div class="indicator-labels">
+                            <span>Stress Probability</span>
+                            <span id="stress-pct-label" style="color: var(--danger);">0%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill fill-stress" id="stress-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-indicator">
+                        <div class="indicator-labels">
+                            <span>Tranquility / Calmness Probability</span>
+                            <span id="normal-pct-label" style="color: var(--secondary);">0%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill fill-normal" id="normal-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- AI Recommended Self-Care Advice Card -->
+                    <div class="recommendation-card">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <div class="recommendation-content">
+                            <h4 id="recommendation-header">Self-Care Directive</h4>
+                            <p id="recommendation-text">Select an image to render artificial intelligence wellness parameters.</p>
+                        </div>
+                    </div>
+
+                    <!-- Model Pipeline Graph Visualizer -->
+                    <div class="architect-info">
+                        <h4><i class="fa-solid fa-server"></i> MobileNetV2 Pipeline Flow</h4>
+                        <div class="architect-flow">
+                            <div class="flow-node active-node">Input<br>(224x224)</div>
+                            <i class="fa-solid fa-angle-right flow-arrow"></i>
+                            <div class="flow-node">Base Model<br>(Frozen)</div>
+                            <i class="fa-solid fa-angle-right flow-arrow"></i>
+                            <div class="flow-node">Pooling<br>& Dense</div>
+                            <i class="fa-solid fa-angle-right flow-arrow"></i>
+                            <div class="flow-node active-node">Sigmoid<br>(Output)</div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Historical Stress Analytics Dashboard Panel (Full Width Card) -->
+        <div class="glass-card analytics-card">
+            <div class="section-header">
+                <i class="fa-solid fa-chart-line"></i>
+                <h2>Historical Stress Index Trends</h2>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                Analytics dashboard logging cognitive stress scans over time. This index registers emotional stress deviations to build psychological resilience mapping.
+            </p>
+            <div class="chart-wrapper">
+                <canvas id="stressChart"></canvas>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built for Senior Year Project &copy; 2026 CalmSphere AI Team. Integrated with FastAPI & MobileNetV2.</p>
+        </footer>
+
+    </div>
+
+    <!-- Modular SPA Script Block -->
+    <script>
+        // API Base URL
+        const API_URL = "";
+
+        // Global Variables
+        let currentImageFile = null;
+        let currentImageUrl = "";
+        let historyChart = null;
+
+        // Initialize App on DOM Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initHistoryChart();
+        });
+
+        // -------------------------------------------------------------
+        // CONSOLE TABS & MEDIA HANDLERS
+        // -------------------------------------------------------------
+        
+        function triggerFileSelect() {
+            document.getElementById('file-input').click();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+
+        // Dropzone listeners
+        const dropArea = document.getElementById('drop-area');
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropArea.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropArea.classList.remove('dragover');
+            }, false);
+        });
+
+        dropArea.addEventListener('drop', (e) => {
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                processFile(file);
+            }
+        });
+
+        function processFile(file) {
+            currentImageFile = file;
+            currentImageUrl = "";
+            
+            // Render Preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewWrapper = document.getElementById('preview-wrapper');
+                const previewImg = document.getElementById('preview-img');
+                const uploadPanel = document.getElementById('upload-panel');
+                
+                previewImg.src = e.target.result;
+                previewWrapper.style.display = 'block';
+                uploadPanel.style.display = 'none';
+                
+                // Enable button
+                document.getElementById('analyze-btn').removeAttribute('disabled');
+            }
+            reader.readAsDataURL(file);
+            clearSampleSelections();
+        }
+
+        function selectSample(card, url) {
+            clearPreview();
+            clearSampleSelections();
+            stopWebcam();
+            
+            card.classList.add('active');
+            currentImageUrl = url;
+            currentImageFile = null;
+            
+            // Enable button
+            document.getElementById('analyze-btn').removeAttribute('disabled');
+        }
+
+        function clearSampleSelections() {
+            document.querySelectorAll('.sample-card').forEach(card => card.classList.remove('active'));
+        }
+
+        function clearPreview() {
+            currentImageFile = null;
+            currentImageUrl = "";
+            document.getElementById('preview-wrapper').style.display = 'none';
+            document.getElementById('preview-img').src = "";
+            document.getElementById('analyze-btn').setAttribute('disabled', 'true');
+            document.getElementById('upload-panel').style.display = 'block';
+            clearSampleSelections();
+        }
+
+        // -------------------------------------------------------------
+        // RUN AI DIAGNOSIS & INTERFACE UPDATE
+        // -------------------------------------------------------------
+        
+        async function runStressDiagnosis() {
+            if (!currentImageFile && !currentImageUrl) return;
+
+            const loader = document.getElementById('loader');
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const blankState = document.getElementById('blank-result-state');
+            const resultsPanel = document.getElementById('results-panel');
+
+            // Set UI Loading State
+            loader.style.display = 'block';
+            analyzeBtn.setAttribute('disabled', 'true');
+            blankState.style.display = 'none';
+            resultsPanel.style.display = 'none';
+
+            let response;
+            let resultData;
+            
+            try {
+                if (currentImageFile) {
+                    // Upload Binary file
+                    const formData = new FormData();
+                    formData.append("file", currentImageFile);
+                    response = await fetch(`${API_URL}/predict`, {
+                        method: "POST",
+                        body: formData
+                    });
+                } else {
+                    // Send URL request
+                    response = await fetch(`${API_URL}/predict_url`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ url: currentImageUrl })
+                    });
+                }
+
+                if (!response.ok) throw new Error("Inference failed or model loading.");
+                resultData = await response.json();
+                
+                renderDiagnosisResult(resultData);
+            } catch (err) {
+                console.error(err);
+                alert("Deep learning model analysis failed. Ensure the FastAPI backend is running locally on port 8000.");
+                loader.style.display = 'none';
+                analyzeBtn.removeAttribute('disabled');
+                blankState.style.display = 'flex';
+            }
+        }
+
+        function renderDiagnosisResult(data) {
+            const loader = document.getElementById('loader');
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const resultsPanel = document.getElementById('results-panel');
+            
+            // Hide Loader
+            loader.style.display = 'none';
+            analyzeBtn.removeAttribute('disabled');
+            resultsPanel.style.display = 'block';
+
+            // Extract values
+            const label = data.label;
+            const level = data.level;
+            const confidence = data.confidence * 100;
+            const stressProb = data.stress_probability * 100;
+            const calmProb = data.non_stress_probability * 100;
+            
+            // Update Badges & Labels
+            const badge = document.getElementById('stress-badge');
+            badge.innerText = `${level} ${label}`;
+            
+            if (label === "Stress") {
+                badge.className = "badge-status status-stress";
+                document.getElementById('stress-bar').className = "progress-fill fill-stress";
+                document.getElementById('normal-bar').className = "progress-fill";
+            } else {
+                badge.className = "badge-status status-normal";
+                document.getElementById('stress-bar').className = "progress-fill";
+                document.getElementById('normal-bar').className = "progress-fill fill-normal";
+            }
+
+            // Animate progress bars
+            document.getElementById('stress-pct-label').innerText = `${stressProb.toFixed(1)}%`;
+            document.getElementById('normal-pct-label').innerText = `${calmProb.toFixed(1)}%`;
+            
+            setTimeout(() => {
+                document.getElementById('stress-bar').style.width = `${stressProb}%`;
+                document.getElementById('normal-bar').style.width = `${calmProb}%`;
+            }, 100);
+
+            // Recommendations Update
+            document.getElementById('recommendation-header').innerText = `${level} ${label} - Dynamic AI Recommendation`;
+            document.getElementById('recommendation-text').innerText = data.recommendation;
+            document.getElementById('result-timestamp').innerText = `Scanned at ${new Date().toLocaleTimeString()}`;
+
+            // Add item to dashboard history
+            addScanToHistory(stressProb);
+        }
+
+        // -------------------------------------------------------------
+        // STRESS HISTORICAL ANALYTICS (CHART.JS & LOCAL STORAGE)
+        // -------------------------------------------------------------
+        
+        function initHistoryChart() {
+            const ctx = document.getElementById('stressChart').getContext('2d');
+            
+            const history = getScanHistory();
+            const labels = history.map((_, i) => `Scan #${i+1}`);
+            const dataPoints = history.map(item => item.value);
+
+            historyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels.length ? labels : ["Empty"],
+                    datasets: [{
+                        label: 'Stress Index %',
+                        data: dataPoints.length ? dataPoints : [0],
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                        fill: true,
+                        tension: 0.35,
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100,
+                            grid: { color: 'rgba(15, 23, 42, 0.04)' },
+                            ticks: { color: '#64748b', font: { weight: 500 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748b', font: { weight: 500 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function getScanHistory() {
+            const data = localStorage.getItem('calmsphere_history');
+            return data ? JSON.parse(data) : [];
+        }
+
+        function addScanToHistory(value) {
+            const history = getScanHistory();
+            history.push({
+                timestamp: Date.now(),
+                value: value
+            });
+            
+            // Limit to last 8 scans for chart readability
+            if (history.length > 8) history.shift();
+            
+            localStorage.setItem('calmsphere_history', JSON.stringify(history));
+            
+            // Refresh Chart
+            if (historyChart) {
+                historyChart.data.labels = history.map((_, i) => `Scan #${i+1}`);
+                historyChart.data.datasets[0].data = history.map(item => item.value);
+                historyChart.update();
+            }
+        }
+    </script>
+</body>
+</html>
